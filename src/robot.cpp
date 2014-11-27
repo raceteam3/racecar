@@ -3,6 +3,7 @@
 #include <sstream>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
 
 int main(int argc, const char** argv)
 {
@@ -14,15 +15,19 @@ int main(int argc, const char** argv)
   return 0;
 }
 
-Robot::Robot() : m_Servo(0)
+Robot::Robot() : m_Steering(0), m_Motor(0)
 {
 }
 
 Robot::~Robot()
 {
-  delete m_Servo;
-  m_Servo = 0;
+  delete m_Steering;
+  m_Steering = 0;
 
+  delete m_Motor;
+  m_Motor = 0;
+
+  //m_PWMDrivers.clear();
   m_UltraSonicSensors.clear();
 }
 
@@ -31,13 +36,42 @@ void Robot::initialize(const char* cfg)
   boost::property_tree::ptree pt;
   boost::property_tree::json_parser::read_json(cfg, pt);
   try {
-    int addr = pt.get<int>("robot.servo.address");
-    int channel = pt.get<int>("robot.servo.channel");
-    int maxLeft = pt.get<int>("robot.servo.maxLeft");
-    int maxRight = pt.get<int>("robot.servo.maxRight");
-    m_Servo = new Servo(addr, channel, maxLeft, maxRight);
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, pt.get_child("robot.pwm")) {
+      std::string name = child.second.get<std::string>("name");
+      int addr = child.second.get<int>("address");
+      boost::shared_ptr<Adafruit_PWMServoDriver> pwm(new Adafruit_PWMServoDriver(addr));
+      m_PWMDrivers.insert(std::pair<std::string, boost::shared_ptr<Adafruit_PWMServoDriver> >(name, pwm));
+    }
   } catch(boost::property_tree::ptree_error& e) {
-    std::cout << "Failed to read servo configuration" << std::endl;
+    std::cout << "Failed to read pwm configuration" << std::endl;
+    throw;
+  }
+
+  try {
+    int channel = pt.get<int>("robot.steering.channel");
+    int maxLeft = pt.get<int>("robot.steering.maxLeft");
+    int maxRight = pt.get<int>("robot.steering.maxRight");
+    boost::shared_ptr<Adafruit_PWMServoDriver> pwm = m_PWMDrivers.at(pt.get<std::string>("robot.steering.pwm"));
+    m_Steering = new Servo(pwm, channel, maxLeft, maxRight);
+  } catch(boost::property_tree::ptree_error& e) {
+    std::cout << "Failed to read steering servo configuration" << std::endl;
+    throw;
+  } catch(std::out_of_range& e) {
+    std::cout << "Non-existing pwm driver for steering servo" << std::endl;
+    throw;
+  }
+
+  try {
+    int channel = pt.get<int>("robot.motor.channel");
+    int maxForward = pt.get<int>("robot.motor.maxForward");
+    int maxReverse = pt.get<int>("robot.motor.maxReverse");
+    boost::shared_ptr<Adafruit_PWMServoDriver> pwm = m_PWMDrivers.at(pt.get<std::string>("robot.motor.pwm"));
+    m_Motor = new Servo(pwm, channel, maxReverse, maxForward);
+  } catch(boost::property_tree::ptree_error& e) {
+    std::cout << "Failed to read motor configuration" << std::endl;
+    throw;
+  } catch(std::out_of_range& e) {
+    std::cout << "Non-existing pwm driver for motor" << std::endl;
     throw;
   }
 }

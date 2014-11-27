@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <boost/shared_ptr.hpp>
 #include "servo.h"
 
 int main(int argc, const char** argv)
@@ -22,7 +23,8 @@ int main(int argc, const char** argv)
   std::istringstream(argv[5]) >> direction;
 
   std::cout << "Create servo driver" << std::endl;
-  Servo servo(addr, channel, maxLeft, maxRight);
+  boost::shared_ptr<Adafruit_PWMServoDriver> pwm(new Adafruit_PWMServoDriver(addr));
+  Servo servo(pwm, channel, maxLeft, maxRight);
 
   std::cout << "Set direction " << std::abs(direction) << "% " << ((direction < 0) ? "left" : "right") << std::endl;
   servo.setDirection(direction);

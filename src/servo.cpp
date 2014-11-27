@@ -2,11 +2,11 @@
 #include <algorithm>
 #include <iostream>
 
-Servo::Servo(uint8_t addr, uint8_t channel, uint16_t maxLeft, uint16_t maxRight) :
-  m_PWM(addr),
+Servo::Servo(boost::shared_ptr<Adafruit_PWMServoDriver> pwm, uint8_t channel, uint16_t maxLeft, uint16_t maxRight) :
+  m_PWM(pwm),
   m_Channel(channel)
 {
-  m_PWM.setPWMFreq(60);
+  m_PWM->setPWMFreq(60);
   if(maxLeft < maxRight) {
     m_Min = maxLeft;
     m_Max = maxRight;
@@ -24,5 +24,5 @@ void Servo::setDirection(int direction)
     direction = -direction;
   }
   uint16_t value = std::max<uint16_t>(m_Min, std::min<uint16_t>(m_Max, (((double)(m_Min + m_Max))/200.0)*(direction+100)));
-  m_PWM.setPin(m_Channel, value, false);
+  m_PWM->setPin(m_Channel, value, false);
 }

@@ -1,12 +1,26 @@
 {
     "robot":
     {
-	"servo":
+	"pwm":
+	[
+	    {
+		"name": "pwm",
+		"address": 128
+	    }
+	],
+	"steering":
 	{
-	    "address": 128,
+	    "pwm": "pwm",
 	    "channel": 1,
 	    "maxLeft": 460,
 	    "maxRight": 280
+	},
+	"motor":
+	{
+	    "pwm": "pwm",
+	    "channel": 2,
+	    "maxForward": 491,
+	    "maxReverse": 245
 	}
     }
 }
