@@ -1,0 +1,12 @@
+{
+    "robot":
+    {
+	"servo":
+	{
+	    "address": 128,
+	    "channel": 1,
+	    "maxLeft": 460,
+	    "maxRight": 280
+	}
+    }
+}
