@@ -13,7 +13,7 @@ int main(int argc, const char** argv)
       std::istringstream(argv[2]) >> std::hex >> newAddr;
     }
   } else {
-    std::cout << argv[1] << " addr [newAddr]" << std::endl;
+    std::cout << argv[0] << " addr [newAddr]" << std::endl;
     return 1;
   }
 
