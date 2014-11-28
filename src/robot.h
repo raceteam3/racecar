@@ -2,6 +2,7 @@
 #define ROBOT_H
 
 #include "servo.h"
+#include "motor.h"
 #include "srf08.h"
 
 #include <stdint.h>
@@ -20,8 +21,8 @@ class Robot
   void runManual();
 
  private:
-  Servo* m_Steering;
-  Servo* m_Motor;
+  boost::shared_ptr<Servo> m_Steering;
+  boost::shared_ptr<Motor> m_Motor;
   std::map<std::string, boost::shared_ptr<Adafruit_PWMServoDriver> > m_PWMDrivers;
   std::map<int, boost::shared_ptr<srf08> > m_SRF08Sensors;
 };

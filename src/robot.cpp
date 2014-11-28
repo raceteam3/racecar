@@ -21,18 +21,12 @@ int main(int argc, const char** argv)
   return 0;
 }
 
-Robot::Robot() : m_Steering(0), m_Motor(0)
+Robot::Robot()
 {
 }
 
 Robot::~Robot()
 {
-  delete m_Steering;
-  m_Steering = 0;
-
-  delete m_Motor;
-  m_Motor = 0;
-
   m_PWMDrivers.clear();
   m_SRF08Sensors.clear();
 }
@@ -60,7 +54,7 @@ void Robot::initialize(const char* cfg)
     int maxLeft = pt.get<int>("robot.steering.maxLeft");
     int maxRight = pt.get<int>("robot.steering.maxRight");
     boost::shared_ptr<Adafruit_PWMServoDriver> pwm = m_PWMDrivers.at(pt.get<std::string>("robot.steering.pwm"));
-    m_Steering = new Servo(pwm, channel, maxLeft, maxRight);
+    m_Steering = boost::shared_ptr<Servo>(new Servo(pwm, channel, maxLeft, maxRight));
   } catch(boost::property_tree::ptree_error& e) {
     std::cout << "Failed to read steering servo configuration" << std::endl;
     throw;
@@ -74,7 +68,7 @@ void Robot::initialize(const char* cfg)
     int maxForward = pt.get<int>("robot.motor.maxForward");
     int maxReverse = pt.get<int>("robot.motor.maxReverse");
     boost::shared_ptr<Adafruit_PWMServoDriver> pwm = m_PWMDrivers.at(pt.get<std::string>("robot.motor.pwm"));
-    m_Motor = new Servo(pwm, channel, maxReverse, maxForward);
+    m_Motor = boost::shared_ptr<Motor>(new Motor(pwm, channel, maxReverse, maxForward));
   } catch(boost::property_tree::ptree_error& e) {
     std::cout << "Failed to read motor configuration" << std::endl;
     throw;
@@ -106,23 +100,23 @@ void Robot::run()
 #if 0
   /* Go forward at 10% of top speed for five seconds */
   std::cout << "Forward 5 seconds" << std::endl;
-  m_Motor->setDirection(10);
+  m_Motor->setSpeed(10);
   usleep(5000 * 1000);
 
   std::cout << "Break 0.1 second" << std::endl;
-  m_Motor->setDirection(-10);
+  m_Motor->setSpeed(-10);
   usleep(100 * 1000);
 
   /* Go to reverse for 1 second*/
   std::cout << "Reverse 1 second" << std::endl;
-  m_Motor->setDirection(0);
+  m_Motor->setSpeed(0);
   usleep(100 * 1000);
-  m_Motor->setDirection(-10);
+  m_Motor->setSpeed(-10);
   usleep(1000 * 1000);
 
   std::cout << "Halt" << std::endl;
   /* Come to a halt */
-  m_Motor->setDirection(0);
+  m_Motor->setSpeed(0);
 #endif
 }
 
@@ -168,7 +162,7 @@ void Robot::runManual()
         if(speed < 100)
         {
           speed++;
-          m_Motor->setDirection(speed);
+          m_Motor->setSpeed(speed);
         }
         break;
         // Decrease speed
@@ -176,7 +170,7 @@ void Robot::runManual()
         if(speed > -100)
         {
           speed--;
-          m_Motor->setDirection(speed);
+          m_Motor->setSpeed(speed);
         }
         break;
         // Increase left turn
@@ -200,7 +194,7 @@ void Robot::runManual()
       case 'S':
         speed = 0;
         turn = 0;
-        m_Motor->setDirection(speed);
+        m_Motor->setSpeed(speed);
         m_Steering->setDirection(turn);
         break;
         // Stop robot and exit
@@ -208,7 +202,7 @@ void Robot::runManual()
       case 'Q':
         speed = 0;
         turn = 0;
-        m_Motor->setDirection(speed);
+        m_Motor->setSpeed(speed);
         m_Steering->setDirection(turn);
         run = false;
         break;
