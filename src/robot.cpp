@@ -150,6 +150,16 @@ void Robot::runManual()
   refresh();
 
   while(run) {
+    wclear(win);
+    box(win, 0, 0);
+    mvwprintw(win, 1, 2, "SPEED: %i", speed);
+    mvwprintw(win, 2, 2, "TURN: %i", turn);
+
+    mvwprintw(win, 6, 2, "Arrows: Change speed/turn");
+    mvwprintw(win, 7, 2, "s: Stop robot");
+    mvwprintw(win, 8, 2, "q: Stop robot and quit");
+    wrefresh(win);
+
     c = wgetch(win);
     switch(c)
     {
