@@ -4,7 +4,13 @@ ROBOT = srf08.o robot.o Adafruit_PWMServoDriver.o servo.o
 SRF08_TEST = srf08.o srf08_test.o
 PWM_TEST = Adafruit_PWMServoDriver.o pwm_test.o
 SERVO_TEST = Adafruit_PWMServoDriver.o servo.o servo_test.o
-LDFLAGS = -lpthread -lwiringPi
+LDFLAGS = -lpthread
+
+ifdef EMULATE
+CFLAGS += -Iemulation
+else
+LDFLAGS += -lwiringPi
+endif
 
 
 all: robot

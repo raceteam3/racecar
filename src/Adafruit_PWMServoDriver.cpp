@@ -18,6 +18,7 @@
 #include "Adafruit_PWMServoDriver.h"
 #include <wiringPiI2C.h>
 #include <iostream>
+#include <unistd.h>
 #include <cmath>
 
 // Set to true to print some debug messages, or false to disable them.
