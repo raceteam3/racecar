@@ -78,4 +78,25 @@ void Robot::initialize(const char* cfg)
 
 void Robot::run()
 {
+#if 0
+  /* Go forward at 10% of top speed for five seconds */
+  std::cout << "Forward 5 seconds" << std::endl;
+  m_Motor->setDirection(10);
+  usleep(5000 * 1000);
+
+  std::cout << "Break 0.1 second" << std::endl;
+  m_Motor->setDirection(-10);
+  usleep(100 * 1000);
+
+  /* Go to reverse for 1 second*/
+  std::cout << "Reverse 1 second" << std::endl;
+  m_Motor->setDirection(0);
+  usleep(100 * 1000);
+  m_Motor->setDirection(-10);
+  usleep(1000 * 1000);
+
+  std::cout << "Halt" << std::endl;
+  /* Come to a halt */
+  m_Motor->setDirection(0);
+#endif
 }
