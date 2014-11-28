@@ -19,7 +19,7 @@
 	"motor":
 	{
 	    "pwm": "pwm",
-	    "channel": 2,
+	    "channel": 0,
 	    "maxForward": 491,
 	    "maxReverse": 245
 	},
