@@ -39,7 +39,9 @@ void Robot::initialize(const char* cfg)
     BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, pt.get_child("robot.pwm")) {
       std::string name = child.second.get<std::string>("name");
       int addr = child.second.get<int>("address");
+      int frequency = child.second.get<int>("frequency");
       boost::shared_ptr<Adafruit_PWMServoDriver> pwm(new Adafruit_PWMServoDriver(addr));
+      pwm->setPWMFreq(frequency);
       m_PWMDrivers.insert(std::pair<std::string, boost::shared_ptr<Adafruit_PWMServoDriver> >(name, pwm));
     }
   } catch(boost::property_tree::ptree_error& e) {

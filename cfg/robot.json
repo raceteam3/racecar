@@ -5,7 +5,8 @@
 	[
 	    {
 		"name": "pwm",
-		"address": 128
+		"address": 128,
+		"frequency": 60
 	    }
 	],
 	"steering":

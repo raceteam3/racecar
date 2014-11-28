@@ -6,7 +6,6 @@ Servo::Servo(boost::shared_ptr<Adafruit_PWMServoDriver> pwm, uint8_t channel, ui
   m_PWM(pwm),
   m_Channel(channel)
 {
-  m_PWM->setPWMFreq(60);
   if(maxLeft < maxRight) {
     m_Min = maxLeft;
     m_Max = maxRight;
