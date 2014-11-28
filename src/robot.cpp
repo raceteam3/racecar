@@ -27,8 +27,8 @@ Robot::~Robot()
   delete m_Motor;
   m_Motor = 0;
 
-  //m_PWMDrivers.clear();
-  m_UltraSonicSensors.clear();
+  m_PWMDrivers.clear();
+  m_SRF08Sensors.clear();
 }
 
 void Robot::initialize(const char* cfg)
@@ -74,6 +74,23 @@ void Robot::initialize(const char* cfg)
     throw;
   } catch(std::out_of_range& e) {
     std::cout << "Non-existing pwm driver for motor" << std::endl;
+    throw;
+  }
+
+  try {
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, pt.get_child("robot.sensors")) {
+      std::string type = child.second.get<std::string>("type");
+      if(type == "srf08") {
+	int addr = child.second.get<int>("address");
+	int angle = child.second.get<int>("angle");
+	boost::shared_ptr<srf08> sensor(new srf08(addr));
+	m_SRF08Sensors.insert(std::pair<int, boost::shared_ptr<srf08> >(angle, sensor));	
+      } else {
+	std::cout << "Sensor type " << type << " is unkown" << std::endl;
+      }
+    }
+  } catch(boost::property_tree::ptree_error& e) {
+    std::cout << "Failed to read sensor configuration" << std::endl;
     throw;
   }
 }

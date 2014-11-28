@@ -22,6 +22,24 @@
 	    "channel": 2,
 	    "maxForward": 491,
 	    "maxReverse": 245
-	}
+	},
+	"sensors":
+	[
+	    {
+		"type": "srf08",
+		"address": 234,
+		"angle": 270
+	    },
+	    {
+		"type": "srf08",
+		"address": 236,
+		"angle": 0
+	    },
+	    {
+		"type": "srf08",
+		"address": 238,
+		"angle": 90
+	    }
+	]
     }
 }

@@ -7,7 +7,6 @@
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
 #include <map>
-#include <vector>
 #include <string>
 
 class Robot
@@ -23,6 +22,6 @@ class Robot
   Servo* m_Steering;
   Servo* m_Motor;
   std::map<std::string, boost::shared_ptr<Adafruit_PWMServoDriver> > m_PWMDrivers;
-  std::vector<srf08> m_UltraSonicSensors;
+  std::map<int, boost::shared_ptr<srf08> > m_SRF08Sensors;
 };
 #endif
