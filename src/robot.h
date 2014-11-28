@@ -17,6 +17,7 @@ class Robot
 
   void initialize(const char* cfg);
   void run();
+  void runManual();
 
  private:
   Servo* m_Steering;

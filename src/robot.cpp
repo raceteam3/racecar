@@ -4,12 +4,18 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
+#include <ncursesw/ncurses.h>
+
 
 int main(int argc, const char** argv)
 {
   Robot robot;
   robot.initialize((argc > 1) ? argv[1] : "robot.json");
-  robot.run();
+  if(argc > 2 && strcmp(argv[2], "manual") == 0) {
+    robot.runManual();
+  } else {
+    robot.run();
+  }
   // left: 460
   // right :280
   return 0;
@@ -118,4 +124,87 @@ void Robot::run()
   /* Come to a halt */
   m_Motor->setDirection(0);
 #endif
+}
+
+void Robot::runManual()
+{
+  bool run = true;
+
+  int startx = 0;
+  int starty = 0;
+
+  int8_t speed = 0;
+  int8_t turn = 0;
+
+  WINDOW *win;
+  int c;
+
+  initscr();
+  clear();
+  noecho();
+  curs_set(0);
+  cbreak();/* Line buffering disabled. pass on everything */
+
+  win = newwin(20, 50, starty, startx);
+  keypad(win, TRUE);
+  refresh();
+
+  while(run) {
+    c = wgetch(win);
+    switch(c)
+    {
+      // Increase speed
+      case KEY_UP:
+        if(speed < 100)
+        {
+          speed++;
+          m_Motor->setDirection(speed);
+        }
+        break;
+        // Decrease speed
+      case KEY_DOWN:
+        if(speed > -100)
+        {
+          speed--;
+          m_Motor->setDirection(speed);
+        }
+        break;
+        // Increase left turn
+      case KEY_LEFT:
+        if(turn > -100)
+        {
+          turn--;
+          m_Steering->setDirection(turn);
+        }
+        break;
+        // Increase right turn
+      case KEY_RIGHT:
+        if(turn < 100)
+        {
+          turn++;
+          m_Steering->setDirection(turn);
+        }
+        break;
+        // Stop robot
+      case 's':
+      case 'S':
+        speed = 0;
+        turn = 0;
+        m_Motor->setDirection(speed);
+        m_Steering->setDirection(turn);
+        break;
+        // Stop robot and exit
+      case 'q':
+      case 'Q':
+        speed = 0;
+        turn = 0;
+        m_Motor->setDirection(speed);
+        m_Steering->setDirection(turn);
+        run = false;
+        break;
+    }
+  }
+  clrtoeol();
+  refresh();
+  endwin();
 }
