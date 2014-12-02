@@ -7,7 +7,7 @@
 
 srf08::srf08(uint8_t addr)
 {
-  m_Fd = wiringPiI2CSetup(addr);
+  m_Fd = wiringPiI2CSetup(addr / 2);
 }
 
 bool srf08::initiateRanging()
