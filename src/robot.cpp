@@ -84,6 +84,7 @@ void Robot::initialize(const char* cfg)
 	int addr = child.second.get<int>("address");
 	int angle = child.second.get<int>("angle");
 	boost::shared_ptr<srf08> sensor(new srf08(addr));
+	sensor->initiateRanging();
 	m_SRF08Sensors.insert(std::pair<int, boost::shared_ptr<srf08> >(angle, sensor));	
       } else {
 	std::cout << "Sensor type " << type << " is unkown" << std::endl;
@@ -149,9 +150,21 @@ void Robot::runManual()
     mvwprintw(win, 1, 2, "SPEED: %i", speed);
     mvwprintw(win, 2, 2, "TURN: %i", turn);
 
-    mvwprintw(win, 6, 2, "Arrows: Change speed/turn");
-    mvwprintw(win, 7, 2, "s: Stop robot");
-    mvwprintw(win, 8, 2, "q: Stop robot and quit");
+    int i =0;
+    for(std::map<int, boost::shared_ptr<srf08> >::const_iterator iter=m_SRF08Sensors.begin(); iter!=m_SRF08Sensors.end(); ++iter) {
+      if(iter->second->rangingComplete()) {
+	mvwprintw(win, 3+i, 2, "Sensor at %u degrees: %u cm", iter->first, iter->second->getRange());
+      } else {
+	mvwprintw(win, 3+i, 2, "Sensor at %u degrees: ranging", iter->first);
+      }
+      ++i;
+    }
+
+    mvwprintw(win, 6+i, 2, "Arrows: Change speed/turn");
+    mvwprintw(win, 7+i, 2, "s: Stop robot");
+    mvwprintw(win, 8+i, 2, "q: Stop robot and quit");
+    mvwprintw(win, 9+i, 2, "a: Start sensor acquisition");
+    mvwprintw(win, 10+i, 2, "p: Print state");
     wrefresh(win);
 
     c = wgetch(win);
@@ -206,6 +219,18 @@ void Robot::runManual()
         m_Steering->setDirection(turn);
         run = false;
         break;
+      case 'a':
+      case 'A':
+	for(std::map<int, boost::shared_ptr<srf08> >::const_iterator iter=m_SRF08Sensors.begin(); iter!=m_SRF08Sensors.end(); ++iter) {
+	  if(iter->second->rangingComplete()) {
+	    std::cout << "Initiate ranging at " << iter->first << " degrees" << std::endl;
+	    iter->second->initiateRanging();
+	  }
+	}
+	break;
+      case 'p':
+      case 'P':
+	break;
     }
   }
   clrtoeol();
