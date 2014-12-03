@@ -4,6 +4,7 @@ ROBOT = srf08.o robot.o Adafruit_PWMServoDriver.o servo.o motor.o ADS1115.o
 SRF08_TEST = srf08.o srf08_test.o
 PWM_TEST = Adafruit_PWMServoDriver.o pwm_test.o
 SERVO_TEST = Adafruit_PWMServoDriver.o servo.o servo_test.o
+ADS1115_TEST = ADS1115.o ADS1115_test.o
 LDFLAGS = -lpthread -lncursesw
 
 ifdef EMULATE
@@ -26,6 +27,9 @@ pwm_test: $(PWM_TEST)
 
 servo_test: $(SERVO_TEST)
 	${CC} ${CFLAGS} ${SERVO_TEST} ${LDFLAGS} -o $@
+
+ads1115_test: $(ADS1115_TEST)
+	${CC} ${CFLAGS} ${ADS1115_TEST} ${LDFLAGS} -o $@
 
 %.o: %.cpp *.h
 	${CC} ${CFLAGS} -c $<
