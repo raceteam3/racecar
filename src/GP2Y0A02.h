@@ -11,6 +11,6 @@ class GP2Y0A02: public AnalogDistanceSensor
   GP2Y0A02(boost::shared_ptr<ADS1115> adc, uint8_t channel);
 
   virtual void setupRanging();
-  virtual uint16_t voltageToRange(int millivolts);
+  virtual uint16_t voltageToRange(float millivolts);
 };
 #endif

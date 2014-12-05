@@ -19,7 +19,7 @@ class AnalogDistanceSensor
 
 private:
   virtual void setupRanging() = 0;
-  virtual uint16_t voltageToRange(int millivolts) = 0;
+  virtual uint16_t voltageToRange(float millivolts) = 0;
 
 protected:
   boost::shared_ptr<ADS1115> m_Adc;
