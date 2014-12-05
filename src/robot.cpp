@@ -5,6 +5,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include <ncursesw/ncurses.h>
+#include <wiringPi.h>
 #include "GP2Y0A02.h"
 
 
@@ -130,10 +131,25 @@ void Robot::initialize(const char* cfg)
     std::cout << "Failed to read sensor configuration" << std::endl;
     throw;
   }
+  m_LedPin = 14;
+  m_ButtonPin = 15;
+  wiringPiSetupGpio();
+  /* LED is output and default off */
+  pinMode(m_LedPin, OUTPUT);
+  m_LedState = false;
+  digitalWrite(m_LedPin, LOW);
+  /* Button is input with pull-up */
+  pinMode(m_ButtonPin, INPUT);
+  pullUpDnControl(m_ButtonPin, PUD_UP);
 }
 
 void Robot::run()
 {
+  while(digitalRead(m_ButtonPin) == 1) {
+    usleep(100);
+  }
+  digitalWrite(m_LedPin, HIGH);
+
 #if 0
   /* Go forward at 10% of top speed for five seconds */
   std::cout << "Forward 5 seconds" << std::endl;
@@ -194,13 +210,16 @@ void Robot::runManual()
 	mvwprintw(win, 3+i, 2, "Sensor at %u degrees: ranging", iter->first);
       }
       ++i;
-    }
+    }    
+    mvwprintw(win, 3+i, 2, "Button state: %s", (digitalRead(m_ButtonPin) ? "not pressed" : "pressed"));
+    ++i;
 
     mvwprintw(win, 6+i, 2, "Arrows: Change speed/turn");
     mvwprintw(win, 7+i, 2, "s: Stop robot");
     mvwprintw(win, 8+i, 2, "q: Stop robot and quit");
     mvwprintw(win, 9+i, 2, "a: Start sensor acquisition");
-    mvwprintw(win, 10+i, 2, "p: Print state");
+    mvwprintw(win, 10+i, 2, "l: Toggle led");
+    mvwprintw(win, 11+i, 2, "p: Print state");
     wrefresh(win);
 
     c = wgetch(win);
@@ -263,6 +282,11 @@ void Robot::runManual()
 	    iter->second->initiateRanging();
 	  }
 	}
+	break;
+      case 'l':
+      case 'L':
+	digitalWrite(m_LedPin, m_LedState ? LOW : HIGH);
+	m_LedState = !m_LedState;
 	break;
       case 'p':
       case 'P':

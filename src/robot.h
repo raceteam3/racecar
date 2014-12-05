@@ -30,5 +30,8 @@ class Robot
   std::map<int, boost::shared_ptr<srf08> > m_SRF08Sensors;
   std::map<int, boost::shared_ptr<AnalogDistanceSensor> > m_AnalogDistanceSensors;
   std::map<std::string, boost::shared_ptr<ADS1115> > m_ADS1115ADCs;
+  int m_ButtonPin;
+  int m_LedPin;
+  bool m_LedState;
 };
 #endif
