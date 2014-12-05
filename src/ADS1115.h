@@ -197,7 +197,9 @@ class ADS1115 {
         uint8_t pgaMode;
         bool writeBitW(uint8_t regAddr, uint8_t bitNum, uint16_t data);
         bool writeBitsW(uint8_t regAddr, uint8_t bitStart, uint8_t length, uint16_t data);
+	bool writeRegister(uint8_t regAddr, uint16_t data);
         uint16_t readBitsW(uint8_t regAddr, uint8_t bitStart, uint8_t length);
+	uint16_t readRegister(uint8_t regAddr);
 };
 
 #endif /* _ADS1115_H_ */

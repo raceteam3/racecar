@@ -35,6 +35,7 @@ THE SOFTWARE.
 
 #include "ADS1115.h"
 #include <wiringPiI2C.h>
+#include <iostream>
 
 /** Default constructor, uses default I2C address.
  * @see ADS1115_DEFAULT_ADDRESS
@@ -87,7 +88,7 @@ bool ADS1115::testConnection() {
  */
 void ADS1115::waitBusy(uint16_t max_retries) {  
   for(uint16_t i = 0; i < max_retries; i++) {
-    if (getOpStatus()==ADS1115_OS_INACTIVE) break;    
+    if (getOpStatus()==ADS1115_OS_INACTIVE) break;
   }
 }
 
@@ -134,7 +135,8 @@ int16_t ADS1115::getConversion() {
       ADS1115::waitBusy(1000);
       
     }
-    return wiringPiI2CReadReg16(m_Fd, ADS1115_RA_CONVERSION);
+      
+    return readRegister(ADS1115_RA_CONVERSION);
 }
 /** Get AIN0/N1 differential.
  * This changes the MUX setting to AIN0/N1 if necessary, triggers a new
@@ -306,7 +308,7 @@ float ADS1115::getMvPerCount() {
  * @see ADS1115_CFG_OS_BIT
  */
 uint8_t ADS1115::getOpStatus() {
-    return ((wiringPiI2CReadReg16(m_Fd, ADS1115_RA_CONFIG) & (1 << ADS1115_CFG_OS_BIT)) ? ADS1115_OS_INACTIVE : ADS1115_OS_ACTIVE);
+    return ((readRegister(ADS1115_RA_CONFIG) & (1 << ADS1115_CFG_OS_BIT)) ? ADS1115_OS_INACTIVE : ADS1115_OS_ACTIVE);
 }
 /** Set operational status.
  * This bit can only be written while in power-down mode (no conversions active).
@@ -399,7 +401,7 @@ void ADS1115::setGain(uint8_t gain) {
  * @see ADS1115_CFG_MODE_BIT
  */
 uint8_t ADS1115::getMode() {
-    return ((wiringPiI2CReadReg16(m_Fd, ADS1115_RA_CONFIG) & (1 << ADS1115_CFG_MODE_BIT)) ? ADS1115_MODE_SINGLESHOT : ADS1115_MODE_CONTINUOUS);
+    return ((readRegister(ADS1115_RA_CONFIG) & (1 << ADS1115_CFG_MODE_BIT)) ? ADS1115_MODE_SINGLESHOT : ADS1115_MODE_CONTINUOUS);
 }
 /** Set device mode.
  * @param mode New device mode
@@ -447,7 +449,7 @@ void ADS1115::setRate(uint8_t rate) {
  * @see ADS1115_CFG_COMP_MODE_BIT
  */
 uint8_t ADS1115::getComparatorMode() {
-    return ((wiringPiI2CReadReg16(m_Fd, ADS1115_RA_CONFIG) & (1 << ADS1115_CFG_COMP_MODE_BIT)) ? ADS1115_COMP_MODE_WINDOW : ADS1115_COMP_MODE_HYSTERESIS);
+  return ((readRegister(ADS1115_RA_CONFIG) & (1 << ADS1115_CFG_COMP_MODE_BIT)) ? ADS1115_COMP_MODE_WINDOW : ADS1115_COMP_MODE_HYSTERESIS);
 }
 /** Set comparator mode.
  * @param mode New comparator mode
@@ -467,7 +469,7 @@ void ADS1115::setComparatorMode(uint8_t mode) {
  * @see ADS1115_CFG_COMP_POL_BIT
  */
 uint8_t ADS1115::getComparatorPolarity() {
-    return ((wiringPiI2CReadReg16(m_Fd, ADS1115_RA_CONFIG) & (1 << ADS1115_CFG_COMP_POL_BIT)) ? ADS1115_COMP_POL_ACTIVE_HIGH : ADS1115_COMP_POL_ACTIVE_LOW);
+  return ((readRegister(ADS1115_RA_CONFIG) & (1 << ADS1115_CFG_COMP_POL_BIT)) ? ADS1115_COMP_POL_ACTIVE_HIGH : ADS1115_COMP_POL_ACTIVE_LOW);
 }
 /** Set comparator polarity setting.
  * @param polarity New comparator polarity setting
@@ -487,7 +489,7 @@ void ADS1115::setComparatorPolarity(uint8_t polarity) {
  * @see ADS1115_CFG_COMP_LAT_BIT
  */
 bool ADS1115::getComparatorLatchEnabled() {
-    return ((wiringPiI2CReadReg16(m_Fd, ADS1115_RA_CONFIG) & (1 << ADS1115_CFG_COMP_LAT_BIT)) ? ADS1115_COMP_LAT_LATCHING : ADS1115_COMP_LAT_NON_LATCHING);
+  return ((readRegister(ADS1115_RA_CONFIG) & (1 << ADS1115_CFG_COMP_LAT_BIT)) ? ADS1115_COMP_LAT_LATCHING : ADS1115_COMP_LAT_NON_LATCHING);
 }
 /** Set comparator latch enabled value.
  * @param enabled New comparator latch enabled value
@@ -533,28 +535,28 @@ void ADS1115::setComparatorQueueMode(uint8_t mode) {
  * @see ADS1115_RA_LO_THRESH
  */
 int16_t ADS1115::getLowThreshold() {
-    return wiringPiI2CReadReg16(m_Fd, ADS1115_RA_LO_THRESH);
+  return readRegister(ADS1115_RA_LO_THRESH);
 }
 /** Set low threshold value.
  * @param threshold New low threshold value
  * @see ADS1115_RA_LO_THRESH
  */
 void ADS1115::setLowThreshold(int16_t threshold) {
-    wiringPiI2CWriteReg16(m_Fd, ADS1115_RA_LO_THRESH, threshold);
+  writeRegister(ADS1115_RA_LO_THRESH, threshold);
 }
 /** Get high threshold value.
  * @return Current high threshold value
  * @see ADS1115_RA_HI_THRESH
  */
 int16_t ADS1115::getHighThreshold() {
-    return wiringPiI2CReadReg16(m_Fd, ADS1115_RA_HI_THRESH);
+  return readRegister(ADS1115_RA_HI_THRESH);
 }
 /** Set high threshold value.
  * @param threshold New high threshold value
  * @see ADS1115_RA_HI_THRESH
  */
 void ADS1115::setHighThreshold(int16_t threshold) {
-    wiringPiI2CWriteReg16(m_Fd, ADS1115_RA_HI_THRESH, threshold);
+  writeRegister(ADS1115_RA_HI_THRESH, threshold);
 }
 
 // Create a mask between two bits
@@ -583,66 +585,57 @@ uint16_t getValueFromBits(uint16_t extractFrom, int high, int length)
  */
 void ADS1115::showConfigRegister()
 {
-    uint16_t configRegister = wiringPiI2CReadReg16(m_Fd, ADS1115_RA_CONFIG);
+  uint16_t configRegister = readRegister(ADS1115_RA_CONFIG);
     
     
-    #ifdef ADS1115_SERIAL_DEBUG
-      Serial.print("Register is:");
-      Serial.println(configRegister,BIN);
+#ifdef ADS1115_SERIAL_DEBUG
+    std::cout << std::hex;
+    std::cout << "Register is:" << configRegister << std::endl;
   
-      Serial.print("OS:\t");
-      Serial.println(getValueFromBits(configRegister, 
-        ADS1115_CFG_OS_BIT,1), BIN);
-      Serial.print("MUX:\t");
-      Serial.println(getValueFromBits(configRegister,  
-        ADS1115_CFG_MUX_BIT,ADS1115_CFG_MUX_LENGTH), BIN);
+    std::cout << "OS:\t" << getValueFromBits(configRegister, ADS1115_CFG_OS_BIT,1) << std::endl;
+      std::cout << "MUX:\t" << getValueFromBits(configRegister,  
+        ADS1115_CFG_MUX_BIT,ADS1115_CFG_MUX_LENGTH) << std::endl;
         
-      Serial.print("PGA:\t");
-      Serial.println(getValueFromBits(configRegister, 
-        ADS1115_CFG_PGA_BIT,ADS1115_CFG_PGA_LENGTH), BIN);
+      std::cout << "PGA:\t" << getValueFromBits(configRegister, 
+        ADS1115_CFG_PGA_BIT,ADS1115_CFG_PGA_LENGTH) << std::endl;
         
-      Serial.print("MODE:\t");
-      Serial.println(getValueFromBits(configRegister,
-        ADS1115_CFG_MODE_BIT,1), BIN);
+      std::cout << "MODE:\t" << getValueFromBits(configRegister,
+        ADS1115_CFG_MODE_BIT,1) << std::endl;
         
-      Serial.print("DR:\t");
-      Serial.println(getValueFromBits(configRegister, 
-        ADS1115_CFG_DR_BIT,ADS1115_CFG_DR_LENGTH), BIN);
+      std::cout << "DR:\t" << getValueFromBits(configRegister, 
+        ADS1115_CFG_DR_BIT,ADS1115_CFG_DR_LENGTH) << std::endl;
         
-      Serial.print("CMP_MODE:\t");
-      Serial.println(getValueFromBits(configRegister, 
-        ADS1115_CFG_COMP_MODE_BIT,1), BIN);
+      std::cout << "CMP_MODE:\t" << getValueFromBits(configRegister, 
+        ADS1115_CFG_COMP_MODE_BIT,1) << std::endl;
         
-      Serial.print("CMP_POL:\t");
-      Serial.println(getValueFromBits(configRegister, 
-        ADS1115_CFG_COMP_POL_BIT,1), BIN);
+      std::cout << "CMP_POL:\t" << getValueFromBits(configRegister, 
+        ADS1115_CFG_COMP_POL_BIT,1) << std::endl;
         
-      Serial.print("CMP_LAT:\t");
-      Serial.println(getValueFromBits(configRegister, 
-        ADS1115_CFG_COMP_LAT_BIT,1), BIN);
+      std::cout << "CMP_LAT:\t" << getValueFromBits(configRegister, 
+        ADS1115_CFG_COMP_LAT_BIT,1) << std::endl;
         
-      Serial.print("CMP_QUE:\t");
-      Serial.println(getValueFromBits(configRegister, 
-        ADS1115_CFG_COMP_QUE_BIT,ADS1115_CFG_COMP_QUE_LENGTH), BIN);
-    #endif
+      std::cout << "CMP_QUE:\t" << getValueFromBits(configRegister, 
+        ADS1115_CFG_COMP_QUE_BIT,ADS1115_CFG_COMP_QUE_LENGTH) << std::endl;
+      std::cout << std::dec;
+#endif
     
 };
 
 
 bool ADS1115::writeBitW(uint8_t regAddr, uint8_t bitNum, uint16_t data)
 {
-    uint16_t val = wiringPiI2CReadReg16(m_Fd, regAddr);
+  uint16_t val = readRegister(regAddr);
     if(data) {
         val |= (1 << bitNum);
     } else {
         val &= ~(1 << bitNum);
     }
-    return (wiringPiI2CWriteReg16(m_Fd, regAddr, val) >= 0);
+    return (writeRegister(regAddr, val) >= 0);
 }
 
 bool ADS1115::writeBitsW(uint8_t regAddr, uint8_t bitStart, uint8_t length, uint16_t data)
 {
-    int ret = wiringPiI2CReadReg16(m_Fd, regAddr);
+  int ret = readRegister(regAddr);
     if(ret < 0) {
         return false;
     }
@@ -652,14 +645,30 @@ bool ADS1115::writeBitsW(uint8_t regAddr, uint8_t bitStart, uint8_t length, uint
     data &= mask; // zero all non-important bits in data
     val &= ~(mask); // zero all important bits in existing word
     val |= data; // combine data with existing word
-    return (wiringPiI2CWriteReg16(m_Fd, regAddr, val) >= 0);
+    return (writeRegister(regAddr, val) >= 0);
 }
 
 uint16_t ADS1115::readBitsW(uint8_t regAddr, uint8_t bitStart, uint8_t length)
 {
-    uint16_t val = wiringPiI2CReadReg16(m_Fd, ADS1115_RA_CONFIG);
+  uint16_t val = readRegister(ADS1115_RA_CONFIG);
     uint16_t mask = ((1 << length) - 1) << (bitStart - length + 1);
     val &= mask;
     val >>= (bitStart - length + 1);
     return val;
+}
+
+bool ADS1115::writeRegister(uint8_t regAddr, uint16_t data)
+{
+  uint8_t buf[2];
+  buf[1] = (data & 0xFF);
+  buf[0] = ((data >> 8) & 0xFF);
+  return (wiringPiI2CWriteBlockData(m_Fd, regAddr, 2, buf) > 0);
+}
+
+uint16_t ADS1115::readRegister(uint8_t regAddr)
+{
+  uint8_t buf[2];
+  wiringPiI2CReadBlockData(m_Fd, regAddr, 2, buf);
+  uint16_t data = ((buf[0] << 8) | buf[1]);
+  return data;
 }
