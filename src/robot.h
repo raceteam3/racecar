@@ -5,6 +5,7 @@
 #include "servo.h"
 #include "motor.h"
 #include "srf08.h"
+#include "analog_distance_sensor.h"
 #include "ADS1115.h"
 
 #include <stdint.h>
@@ -27,6 +28,7 @@ class Robot
   boost::shared_ptr<Motor> m_Motor;
   std::map<std::string, boost::shared_ptr<Adafruit_PWMServoDriver> > m_PWMDrivers;
   std::map<int, boost::shared_ptr<srf08> > m_SRF08Sensors;
+  std::map<int, boost::shared_ptr<AnalogDistanceSensor> > m_AnalogDistanceSensors;
   std::map<std::string, boost::shared_ptr<ADS1115> > m_ADS1115ADCs;
 };
 #endif

@@ -5,6 +5,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include <ncursesw/ncurses.h>
+#include "GP2Y0A02.h"
 
 
 int main(int argc, const char** argv)
@@ -78,16 +79,16 @@ void Robot::initialize(const char* cfg)
   }
 
   try {
-    BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, pt.get_child("robot.sensors")) {
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, pt.get_child("robot.ADCs")) {
       std::string type = child.second.get<std::string>("type");
-      if(type == "srf08") {
+      if(type == "ads1115") {
 	int addr = child.second.get<int>("address");
-	int angle = child.second.get<int>("angle");
-	boost::shared_ptr<srf08> sensor(new srf08(addr));
-	sensor->initiateRanging();
-	m_SRF08Sensors.insert(std::pair<int, boost::shared_ptr<srf08> >(angle, sensor));	
+	std::string name = child.second.get<std::string>("name");
+	boost::shared_ptr<ADS1115> adc(new ADS1115(addr));
+	adc->initialize();
+	m_ADS1115ADCs.insert(std::pair<std::string, boost::shared_ptr<ADS1115> >(name, adc));
       } else {
-	std::cout << "Sensor type " << type << " is unknown" << std::endl;
+	std::cout << "ADC type " << type << " is unknown" << std::endl;
       }
     }
   } catch(boost::property_tree::ptree_error& e) {
@@ -96,16 +97,33 @@ void Robot::initialize(const char* cfg)
   }
 
   try {
-    BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, pt.get_child("robot.ADCs")) {
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, pt.get_child("robot.sensors")) {
       std::string type = child.second.get<std::string>("type");
-      if(type == "ads1115") {
-	int addr = child.second.get<int>("address");
-	std::string name = child.second.get<std::string>("name");
-	boost::shared_ptr<ADS1115> adc(new ADS1115(addr));
-	adc->initialize();
-	m_ADS1115ADCs.insert(std::pair<std::string, boost::shared_ptr<ADS1115> >(name, adc));	
+      if(type == "srf08") {
+        int addr = child.second.get<int>("address");
+	int angle = child.second.get<int>("angle");
+	boost::shared_ptr<srf08> sensor(new srf08(addr));
+	sensor->initiateRanging();
+	m_SRF08Sensors.insert(std::pair<int, boost::shared_ptr<srf08> >(angle, sensor));
+      } else if(type =="analog") {
+          std::string driver = child.second.get<std::string>("driver");
+          int channel = child.second.get<int>("channel");
+          int angle = child.second.get<int>("angle");
+          boost::shared_ptr<ADS1115> adc;
+          try {
+              adc = m_ADS1115ADCs.at(child.second.get<std::string>("adc"));
+          } catch(std::out_of_range& e) {
+              std::cout << "Non-existing ADC for analog sensor" << std::endl;
+              continue;
+          }
+          if(driver == "GP2Y0A02") {
+              boost::shared_ptr<GP2Y0A02> sensor(new GP2Y0A02(adc, channel));
+              m_AnalogDistanceSensors.insert(std::pair<int, boost::shared_ptr<AnalogDistanceSensor> >(angle, sensor));
+          } else {
+              std::cout << "Analog sensor driver " << driver << " is unknown" << std::endl;
+          }
       } else {
-	std::cout << "ADC type " << type << " is unknown" << std::endl;
+	std::cout << "Sensor type " << type << " is unknown" << std::endl;
       }
     }
   } catch(boost::property_tree::ptree_error& e) {
