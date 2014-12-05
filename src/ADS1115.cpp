@@ -129,12 +129,14 @@ void ADS1115::waitBusy(uint16_t max_retries) {
  * @see ADS1115_MUX_P3_NG
  */
 int16_t ADS1115::getConversion() {
+#if 0
     if (devMode == ADS1115_MODE_SINGLESHOT) 
     {  
       setOpStatus(ADS1115_OS_ACTIVE);
       ADS1115::waitBusy(1000);
       
     }
+#endif
       
     return readRegister(ADS1115_RA_CONVERSION);
 }

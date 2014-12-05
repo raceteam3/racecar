@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <unistd.h>
 #include "ADS1115.h"
 
 int main(int argc, const char** argv)
@@ -38,6 +39,9 @@ int main(int argc, const char** argv)
 
   if(continuous) {
     adc.setMode(ADS1115_MODE_CONTINUOUS);
+  } else {
+      adc.setOpStatus(ADS1115_OS_ACTIVE);
+      adc.waitBusy(1000);
   }
   do {
     std::cout << "ADC channel " << channel << ": " << adc.getMilliVolts() << " mV" << std::endl;
