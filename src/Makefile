@@ -35,4 +35,4 @@ ads1115_test: $(ADS1115_TEST)
 	${CC} ${CFLAGS} -c $<
 
 clean:
-	rm -rf *.o *.so *.a robot srf08_test pwm_test servo_test
+	rm -rf *.o *.so *.a robot srf08_test pwm_test servo_test ads1115_test
