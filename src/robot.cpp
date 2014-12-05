@@ -87,7 +87,25 @@ void Robot::initialize(const char* cfg)
 	sensor->initiateRanging();
 	m_SRF08Sensors.insert(std::pair<int, boost::shared_ptr<srf08> >(angle, sensor));	
       } else {
-	std::cout << "Sensor type " << type << " is unkown" << std::endl;
+	std::cout << "Sensor type " << type << " is unknown" << std::endl;
+      }
+    }
+  } catch(boost::property_tree::ptree_error& e) {
+    std::cout << "Failed to read sensor configuration" << std::endl;
+    throw;
+  }
+
+  try {
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, pt.get_child("robot.ADCs")) {
+      std::string type = child.second.get<std::string>("type");
+      if(type == "ads1115") {
+	int addr = child.second.get<int>("address");
+	std::string name = child.second.get<std::string>("name");
+	boost::shared_ptr<ADS1115> adc(new ADS1115(addr));
+	adc->initialize();
+	m_ADS1115ADCs.insert(std::pair<std::string, boost::shared_ptr<ADS1115> >(name, adc));	
+      } else {
+	std::cout << "ADC type " << type << " is unknown" << std::endl;
       }
     }
   } catch(boost::property_tree::ptree_error& e) {

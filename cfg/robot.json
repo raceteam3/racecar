@@ -23,6 +23,14 @@
 	    "maxForward": 491,
 	    "maxReverse": 245
 	},
+	"ADCs":
+	[
+		{
+			"name": "adc",
+			"type": "ads1115",
+			"address": 144
+		}
+	],
 	"sensors":
 	[
 	    {
