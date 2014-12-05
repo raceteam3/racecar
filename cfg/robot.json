@@ -47,7 +47,21 @@
 		    "type": "srf08",
 		    "address": 238,
 		    "angle": 90
-	    }
+	    },
+      {
+        "type": "analog",
+        "driver": "GP2Y0A02",
+        "adc": "adc",
+        "angle": 45,
+        "channel": 0
+      },
+      {
+        "type": "analog",
+        "driver": "GP2Y0A02",
+        "adc": "adc",
+        "angle": 135,
+        "channel": 1
+      }
 	  ]
   }
 }
