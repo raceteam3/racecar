@@ -210,6 +210,14 @@ void Robot::runManual()
 	mvwprintw(win, 3+i, 2, "Sensor at %u degrees: ranging", iter->first);
       }
       ++i;
+    }
+    for(std::map<int, boost::shared_ptr<AnalogDistanceSensor> >::const_iterator iter=m_AnalogDistanceSensors.begin(); iter!=m_AnalogDistanceSensors.end(); ++iter) {
+      if(iter->second->rangingComplete()) {
+	mvwprintw(win, 3+i, 2, "Analog sensor at %u degrees: %u cm", iter->first, iter->second->getRange());
+      } else {
+	mvwprintw(win, 3+i, 2, "Analog sensor at %u degrees: ranging", iter->first);
+      }
+      ++i;
     }    
     mvwprintw(win, 3+i, 2, "Button state: %s", (digitalRead(m_ButtonPin) ? "not pressed" : "pressed"));
     ++i;
@@ -279,6 +287,12 @@ void Robot::runManual()
 	for(std::map<int, boost::shared_ptr<srf08> >::const_iterator iter=m_SRF08Sensors.begin(); iter!=m_SRF08Sensors.end(); ++iter) {
 	  if(iter->second->rangingComplete()) {
 	    std::cout << "Initiate ranging at " << iter->first << " degrees" << std::endl;
+	    iter->second->initiateRanging();
+	  }
+	}
+	for(std::map<int, boost::shared_ptr<AnalogDistanceSensor> >::const_iterator iter=m_AnalogDistanceSensors.begin(); iter!=m_AnalogDistanceSensors.end(); ++iter) {
+	  if(iter->second->rangingComplete()) {
+	    std::cout << "Initiate ranging (analog) at " << iter->first << " degrees" << std::endl;
 	    iter->second->initiateRanging();
 	  }
 	}
