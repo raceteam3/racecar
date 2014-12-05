@@ -1,53 +1,53 @@
 {
-    "robot":
-    {
-	"pwm":
-	[
+  "robot":
+  {
+	  "pwm":
+	  [
 	    {
-		"name": "pwm",
-		"address": 128,
-		"frequency": 60
+		    "name": "pwm",
+		    "address": 128,
+		    "frequency": 60
 	    }
-	],
-	"steering":
-	{
+	  ],
+	  "steering":
+	  {
 	    "pwm": "pwm",
 	    "channel": 1,
 	    "maxLeft": 460,
 	    "maxRight": 280
-	},
-	"motor":
-	{
+	  },
+	  "motor":
+	  {
 	    "pwm": "pwm",
 	    "channel": 0,
 	    "maxForward": 491,
 	    "maxReverse": 245
-	},
-	"ADCs":
-	[
-		{
-			"name": "adc",
-			"type": "ads1115",
-			"address": 144
-		}
-	],
-	"sensors":
-	[
+	  },
+	  "ADCs":
+	  [
+		  {
+			  "name": "adc",
+			  "type": "ads1115",
+			  "address": 144
+		  }
+	  ],
+	  "sensors":
+	  [
 	    {
-		"type": "srf08",
-		"address": 234,
-		"angle": 270
+		    "type": "srf08",
+		    "address": 234,
+		    "angle": 270
 	    },
 	    {
-		"type": "srf08",
-		"address": 236,
-		"angle": 0
+		    "type": "srf08",
+		    "address": 236,
+		    "angle": 0
 	    },
 	    {
-		"type": "srf08",
-		"address": 238,
-		"angle": 90
+		    "type": "srf08",
+		    "address": 238,
+		    "angle": 90
 	    }
-	]
-    }
+	  ]
+  }
 }
