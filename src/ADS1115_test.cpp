@@ -19,6 +19,8 @@ int main(int argc, const char** argv)
   ADS1115 adc(addr);
   adc.initialize();
 
+  adc.setGain(ADS1115_PGA_6P144);
+
   switch(channel) {
   case 0:
     adc.setMultiplexer(ADS1115_MUX_P0_NG);
@@ -38,7 +40,7 @@ int main(int argc, const char** argv)
     adc.setMode(ADS1115_MODE_CONTINUOUS);
   }
   do {
-    std::cout << "ADC channel " << channel << ": " << adc.getConversion() << " mV" << std::endl;
+    std::cout << "ADC channel " << channel << ": " << adc.getMilliVolts() << " mV" << std::endl;
     usleep(100*1000);
   } while(continuous);
 
