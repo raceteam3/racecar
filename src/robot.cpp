@@ -181,6 +181,14 @@ void Robot::run()
       analogIter->second->initiateRanging();
     }
     else if(analogIter->second->rangingComplete()) {
+        std::map<int, boost::circular_buffer<int> >::iterator dIter = distances.find(analogIter->first);
+        if(dIter == distances.end()) {
+          distances.insert(std::pair<int, boost::circular_buffer<int> >(analogIter->first, boost::circular_buffer<int>(10)));
+          dIter = distances.find(analogIter->first);
+        }
+        int range = analogIter->second->getRange();
+        dIter->second.push_back(range);
+
       ++analogIter;
       if(analogIter==m_AnalogDistanceSensors.end()) {
         analogIter=m_AnalogDistanceSensors.begin();
