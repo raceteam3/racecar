@@ -155,6 +155,7 @@ void Robot::run()
   bool running = true;
 
   std::map<int, boost::circular_buffer<int> > distances;
+  bool lastForward = false;
 
   while(running) {
 
@@ -191,18 +192,21 @@ void Robot::run()
     std::map<int, boost::circular_buffer<int> >::iterator dIter = distances.find(0);
     if(!dIter->second.empty()) {
       std::cout << "Has forward reading: " << dIter->second[0] << std::endl;
-      if(dIter->second[0] < 50) {
+      if(dIter->second[0] < 250) {
         forward = false;
       }
     }
 
     /* Acuate */
-    if(forward) {
-      std::cout << "Forward" << std::endl;
-      m_Motor->setSpeed(15);
-    } else {
-      std::cout << "Stop" << std::endl;
-      m_Motor->breakMotor();
+    if(lastForward != forward) {
+      if(forward) {
+        std::cout << "Forward" << std::endl;
+        m_Motor->setSpeed(7);
+      } else {
+        std::cout << "Stop" << std::endl;
+        m_Motor->breakMotor();
+      }
+      lastForward = forward;
     }
   }
 
