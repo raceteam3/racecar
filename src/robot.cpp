@@ -198,34 +198,44 @@ void Robot::run()
 
     /* Decide */
     bool forward = true;
+    int turnMultiplier = 1;
     std::map<int, boost::circular_buffer<int> >::iterator dIter = distances.find(0);
     if(!dIter->second.empty()) {
       if(dIter->second[0] < 80) {
-        forward = false;
+	turnMultiplier = 2;
+      }
+      if(dIter->second[0] < 50) {
+	turnMultiplier = 4;
+      }
+      if(dIter->second[0] < 30) {
+	forward = false;
       }
     }
 
     int direction = 0;
-    std::map<int, boost::circular_buffer<int> >::iterator leftDistance = distances.find(270);
-    std::map<int, boost::circular_buffer<int> >::iterator rightDistance = distances.find(90);
+    std::map<int, boost::circular_buffer<int> >::iterator leftDistance = distances.find(135);
+    std::map<int, boost::circular_buffer<int> >::iterator rightDistance = distances.find(45);
     if(!leftDistance->second.empty() && !rightDistance->second.empty()) {
-      if(leftDistance->second[0] > rightDistance->second[0]) {
-	if(rightDistance->second[0] < 50) {
+      if(leftDistance->second[0] > rightDistance->second[0] + 20) {
+	if((rightDistance->second[0]) < 50  || (turnMultiplier != 1)) {
 	  direction = -80;
 	}
       } else {
-	if(leftDistance->second[0] < 50) {
+	if((leftDistance->second[0] < 90) || (turnMultiplier != 1)) {
 	  direction = 80;
 	}
       }
     }
+
+    direction *= turnMultiplier;
 
     /* Acuate */
     if(lastForward != forward) {
       if(forward) {
         m_Motor->setSpeed(m_MinSpeed);
       } else {
-        m_Motor->breakMotor();
+	m_Motor->setSpeed(0);
+	//        m_Motor->breakMotor();
       }
       lastForward = forward;
     }
@@ -234,6 +244,8 @@ void Robot::run()
       lastDirection = direction;
     }
   }
+
+  usleep(1000 * 10);
 
 #if 0
   /* Go forward at 10% of top speed for five seconds */
