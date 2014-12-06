@@ -169,7 +169,6 @@ void Robot::run()
         }
         int range = iter->second->getRange();
         dIter->second.push_back(range);
-        std::cout << "Sensor at " << iter->first << " degrees: " << range << "  cm" << std::endl;
         iter->second->initiateRanging();
       }
     }
@@ -179,7 +178,6 @@ void Robot::run()
       analogIter->second->initiateRanging();
     }
     else if(analogIter->second->rangingComplete()) {
-      std::cout << "Analog sensor at " << analogIter->first << " degrees: " << analogIter->second->getRange() << "  cm" << std::endl;
       ++analogIter;
       if(analogIter==m_AnalogDistanceSensors.end()) {
         analogIter=m_AnalogDistanceSensors.begin();
@@ -191,8 +189,7 @@ void Robot::run()
     bool forward = true;
     std::map<int, boost::circular_buffer<int> >::iterator dIter = distances.find(0);
     if(!dIter->second.empty()) {
-      std::cout << "Has forward reading: " << dIter->second[0] << std::endl;
-      if(dIter->second[0] < 250) {
+      if(dIter->second[0] < 80) {
         forward = false;
       }
     }
@@ -200,10 +197,8 @@ void Robot::run()
     /* Acuate */
     if(lastForward != forward) {
       if(forward) {
-        std::cout << "Forward" << std::endl;
         m_Motor->setSpeed(7);
       } else {
-        std::cout << "Stop" << std::endl;
         m_Motor->breakMotor();
       }
       lastForward = forward;
