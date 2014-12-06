@@ -22,6 +22,6 @@ void Servo::setDirection(int direction)
   if(m_InvertDirection) {
     direction = -direction;
   }
-  uint16_t value = std::max<uint16_t>(m_Min, std::min<uint16_t>(m_Max, (((double)(m_Min + m_Max))/200.0)*(direction+100)));
+  uint16_t value = std::max<uint16_t>(m_Min, std::min<uint16_t>(m_Max, (((double)(m_Min + m_Max))/2000.0)*(direction+1000)));
   m_PWM->setPin(m_Channel, value, false);
 }

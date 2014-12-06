@@ -15,7 +15,7 @@ void Motor::setSpeed(int speed)
     m_Servo.setDirection(speed);
   } else {
     /* Break */
-    m_Servo.setDirection(-100);
+    m_Servo.setDirection(-1000);
     usleep(100 * 1000);
     /* Stop motor */
     m_Servo.setDirection(0);
@@ -28,9 +28,9 @@ void Motor::setSpeed(int speed)
 
 void Motor::breakMotor()
 {
-  if(m_CurrentSpeed > 5) {
-    m_Servo.setDirection(-100);
-    m_CurrentSpeed = -100;
+  if(m_CurrentSpeed > 50) {
+    m_Servo.setDirection(-1000);
+    m_CurrentSpeed = -1000;
   } else {
     setSpeed(0);
   }

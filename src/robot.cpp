@@ -70,6 +70,7 @@ void Robot::initialize(const char* cfg)
     int channel = pt.get<int>("robot.motor.channel");
     int maxForward = pt.get<int>("robot.motor.maxForward");
     int maxReverse = pt.get<int>("robot.motor.maxReverse");
+    m_MinSpeed = pt.get<int>("robot.motor.minSpeed");
     boost::shared_ptr<Adafruit_PWMServoDriver> pwm = m_PWMDrivers.at(pt.get<std::string>("robot.motor.pwm"));
     m_Motor = boost::shared_ptr<Motor>(new Motor(pwm, channel, maxReverse, maxForward));
   } catch(boost::property_tree::ptree_error& e) {
@@ -132,6 +133,7 @@ void Robot::initialize(const char* cfg)
     std::cout << "Failed to read sensor configuration" << std::endl;
     throw;
   }
+
   m_LedPin = 14;
   m_ButtonPin = 15;
   wiringPiSetupGpio();
@@ -156,6 +158,7 @@ void Robot::run()
 
   std::map<int, boost::circular_buffer<int> > distances;
   bool lastForward = false;
+  int lastDirection = 0;
 
   while(running) {
 
@@ -194,14 +197,33 @@ void Robot::run()
       }
     }
 
+    int direction = 0;
+    std::map<int, boost::circular_buffer<int> >::iterator leftDistance = distances.find(270);
+    std::map<int, boost::circular_buffer<int> >::iterator rightDistance = distances.find(90);
+    if(!leftDistance->second.empty() && !rightDistance->second.empty()) {
+      if(leftDistance->second[0] > rightDistance->second[0]) {
+	if(rightDistance->second[0] < 50) {
+	  direction = -80;
+	}
+      } else {
+	if(leftDistance->second[0] < 50) {
+	  direction = 80;
+	}
+      }
+    }
+
     /* Acuate */
     if(lastForward != forward) {
       if(forward) {
-        m_Motor->setSpeed(7);
+        m_Motor->setSpeed(m_MinSpeed);
       } else {
         m_Motor->breakMotor();
       }
       lastForward = forward;
+    }
+    if(lastDirection != direction) {
+      m_Steering->setDirection(direction);
+      lastDirection = direction;
     }
   }
 
@@ -292,7 +314,7 @@ void Robot::runManual()
     {
       // Increase speed
       case KEY_UP:
-        if(speed < 100)
+        if(speed < 1000)
         {
           speed++;
           m_Motor->setSpeed(speed);
@@ -300,7 +322,7 @@ void Robot::runManual()
         break;
         // Decrease speed
       case KEY_DOWN:
-        if(speed > -100)
+        if(speed > -1000)
         {
           speed--;
           m_Motor->setSpeed(speed);
@@ -308,7 +330,7 @@ void Robot::runManual()
         break;
         // Increase left turn
       case KEY_LEFT:
-        if(turn > -100)
+        if(turn > -1000)
         {
           turn--;
           m_Steering->setDirection(turn);
@@ -316,7 +338,7 @@ void Robot::runManual()
         break;
         // Increase right turn
       case KEY_RIGHT:
-        if(turn < 100)
+        if(turn < 1000)
         {
           turn++;
           m_Steering->setDirection(turn);

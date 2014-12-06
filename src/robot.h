@@ -32,6 +32,7 @@ class Robot
   std::map<std::string, boost::shared_ptr<ADS1115> > m_ADS1115ADCs;
   int m_ButtonPin;
   int m_LedPin;
+  int m_MinSpeed;
   bool m_LedState;
 };
 #endif
