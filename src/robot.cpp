@@ -4,6 +4,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
+#include <boost/circular_buffer.hpp>
 #include <ncursesw/ncurses.h>
 #include <wiringPi.h>
 #include "GP2Y0A02.h"
@@ -149,6 +150,61 @@ void Robot::run()
     usleep(100);
   }
   digitalWrite(m_LedPin, HIGH);
+
+  std::map<int, boost::shared_ptr<AnalogDistanceSensor> >::const_iterator analogIter=m_AnalogDistanceSensors.end();
+  bool running = true;
+
+  std::map<int, boost::circular_buffer<int> > distances;
+
+  while(running) {
+
+    /* Sense */
+    for(std::map<int, boost::shared_ptr<srf08> >::const_iterator iter=m_SRF08Sensors.begin(); iter!=m_SRF08Sensors.end(); ++iter) {
+      if(iter->second->rangingComplete()) {
+        std::map<int, boost::circular_buffer<int> >::iterator dIter = distances.find(iter->first);
+        if(dIter == distances.end()) {
+          distances.insert(std::pair<int, boost::circular_buffer<int> >(iter->first, boost::circular_buffer<int>(10)));
+          dIter = distances.find(iter->first);
+        }
+        int range = iter->second->getRange();
+        dIter->second.push_back(range);
+        std::cout << "Sensor at " << iter->first << " degrees: " << range << "  cm" << std::endl;
+        iter->second->initiateRanging();
+      }
+    }
+
+    if(analogIter==m_AnalogDistanceSensors.end()) {
+      analogIter=m_AnalogDistanceSensors.begin();
+      analogIter->second->initiateRanging();
+    }
+    else if(analogIter->second->rangingComplete()) {
+      std::cout << "Analog sensor at " << analogIter->first << " degrees: " << analogIter->second->getRange() << "  cm" << std::endl;
+      ++analogIter;
+      if(analogIter==m_AnalogDistanceSensors.end()) {
+        analogIter=m_AnalogDistanceSensors.begin();
+      }
+      analogIter->second->initiateRanging();
+    }
+
+    /* Decide */
+    bool forward = true;
+    std::map<int, boost::circular_buffer<int> >::iterator dIter = distances.find(0);
+    if(!dIter->second.empty()) {
+      std::cout << "Has forward reading: " << dIter->second[0] << std::endl;
+      if(dIter->second[0] < 50) {
+        forward = false;
+      }
+    }
+
+    /* Acuate */
+    if(forward) {
+      std::cout << "Forward" << std::endl;
+      m_Motor->setSpeed(15);
+    } else {
+      std::cout << "Stop" << std::endl;
+      m_Motor->breakMotor();
+    }
+  }
 
 #if 0
   /* Go forward at 10% of top speed for five seconds */
