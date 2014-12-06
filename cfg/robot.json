@@ -21,7 +21,7 @@
       "pwm": "pwm",
       "channel": 0,
       "maxForward": 491,
-      "maxReverse": 270,
+      "maxReverse": 250,
       "minSpeed": 52
     },
     "ADCs":
