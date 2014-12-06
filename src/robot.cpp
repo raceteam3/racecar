@@ -183,6 +183,8 @@ void Robot::runManual()
   int8_t speed = 0;
   int8_t turn = 0;
 
+  std::map<int, boost::shared_ptr<AnalogDistanceSensor> >::const_iterator analogIter=m_AnalogDistanceSensors.end();
+
   WINDOW *win;
   int c;
 
@@ -215,7 +217,7 @@ void Robot::runManual()
       if(iter->second->rangingComplete()) {
 	mvwprintw(win, 3+i, 2, "Analog sensor at %u degrees: %u cm", iter->first, iter->second->getRange());
       } else {
-	mvwprintw(win, 3+i, 2, "Analog sensor at %u degrees: ranging", iter->first);
+	mvwprintw(win, 3+i, 2, "Analog sensor at %u degrees: no value", iter->first);
       }
       ++i;
     }    
@@ -290,11 +292,17 @@ void Robot::runManual()
 	    iter->second->initiateRanging();
 	  }
 	}
-	for(std::map<int, boost::shared_ptr<AnalogDistanceSensor> >::const_iterator iter=m_AnalogDistanceSensors.begin(); iter!=m_AnalogDistanceSensors.end(); ++iter) {
-	  if(iter->second->rangingComplete()) {
-	    std::cout << "Initiate ranging (analog) at " << iter->first << " degrees" << std::endl;
-	    iter->second->initiateRanging();
+
+	if(analogIter==m_AnalogDistanceSensors.end()) {
+	  analogIter=m_AnalogDistanceSensors.begin();
+	  analogIter->second->initiateRanging();
+	} 
+	else if(analogIter->second->rangingComplete()) {
+	  ++analogIter;
+	  if(analogIter==m_AnalogDistanceSensors.end()) {
+	    analogIter=m_AnalogDistanceSensors.begin();
 	  }
+	  analogIter->second->initiateRanging();
 	}
 	break;
       case 'l':

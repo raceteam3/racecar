@@ -25,6 +25,6 @@ protected:
   boost::shared_ptr<ADS1115> m_Adc;
 
  private:
-  uint8_t m_Channel;
+  int m_Channel;
 };
 #endif
