@@ -2,7 +2,7 @@
 #include <sstream>
 #include <algorithm>
 #include <boost/shared_ptr.hpp>
-#include "servo.h"
+#include "Servo.h"
 
 int main(int argc, const char** argv)
 {

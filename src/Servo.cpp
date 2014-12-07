@@ -1,4 +1,4 @@
-#include "servo.h"
+#include "Servo.h"
 #include <algorithm>
 #include <iostream>
 

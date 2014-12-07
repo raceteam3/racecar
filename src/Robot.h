@@ -2,10 +2,10 @@
 #define ROBOT_H
 
 #include "Adafruit_PWMServoDriver.h"
-#include "servo.h"
-#include "motor.h"
-#include "srf08.h"
-#include "analog_distance_sensor.h"
+#include "Servo.h"
+#include "Motor.h"
+#include "SRF08.h"
+#include "AnalogDistanceSensor.h"
 #include "ADS1115.h"
 
 #include <stdint.h>

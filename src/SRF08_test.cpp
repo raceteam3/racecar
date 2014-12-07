@@ -1,6 +1,6 @@
 #include <iostream>
 #include <sstream>
-#include "srf08.h"
+#include "SRF08.h"
 
 int main(int argc, const char** argv)
 {

@@ -2,7 +2,7 @@
 #define GP2Y0A02_H
 
 #include <stdint.h>
-#include "analog_distance_sensor.h"
+#include "AnalogDistanceSensor.h"
 
 class GP2Y0A02: public AnalogDistanceSensor
 {

@@ -1,13 +1,13 @@
 CC = g++
 CFLAGS = -g -O2 -Wall -D_GNU_SOURCE
-ROBOT = srf08.o robot.o Adafruit_PWMServoDriver.o servo.o motor.o ADS1115.o analog_distance_sensor.o GP2Y0A02.o
+ROBOT = SRF08.o Robot.o Adafruit_PWMServoDriver.o Servo.o Motor.o ADS1115.o AnalogDistanceSensor.o GP2Y0A02.o
 
-MOUSE_TEST = mouse_test.o
-SRF08_TEST = srf08.o srf08_test.o
-PWM_TEST = Adafruit_PWMServoDriver.o pwm_test.o
-SERVO_TEST = Adafruit_PWMServoDriver.o servo.o servo_test.o
+MOUSE_TEST = Mouse_test.o
+SRF08_TEST = SRF08.o SRF08_test.o
+PWM_TEST = Adafruit_PWMServoDriver.o PWM_test.o
+SERVO_TEST = Adafruit_PWMServoDriver.o Servo.o Servo_test.o
 ADS1115_TEST = ADS1115.o ADS1115_test.o
-GP2Y0A02_TEST = ADS1115.o analog_distance_sensor.o GP2Y0A02.o GP2Y0A02_test.o
+GP2Y0A02_TEST = ADS1115.o AnalogDistanceSensor.o GP2Y0A02.o GP2Y0A02_test.o
 LDFLAGS = -lpthread -lncursesw
 
 ifdef EMULATE

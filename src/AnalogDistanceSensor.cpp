@@ -1,4 +1,4 @@
-#include "analog_distance_sensor.h"
+#include "AnalogDistanceSensor.h"
 
 
 AnalogDistanceSensor::AnalogDistanceSensor(boost::shared_ptr<ADS1115> adc, uint8_t channel) : m_Adc(adc), m_Channel(channel)

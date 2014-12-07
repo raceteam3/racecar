@@ -2,7 +2,7 @@
 #define MOTOR_H
 
 #include <stdint.h>
-#include "servo.h"
+#include "Servo.h"
 #include "Adafruit_PWMServoDriver.h"
 
 #include <boost/shared_ptr.hpp>

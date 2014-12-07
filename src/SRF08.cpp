@@ -1,4 +1,4 @@
-#include "srf08.h"
+#include "SRF08.h"
 
 #include <unistd.h>
 #include <wiringPiI2C.h>
