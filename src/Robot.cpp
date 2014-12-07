@@ -176,6 +176,9 @@ void Robot::run()
   bool lastForward = false;
   int lastDirection = 0;
 
+  int forwardSpeed = m_MinSpeed;
+  int reverseSpeed = -m_MinSpeed;
+
   while(running) {
 
     /* Sense */
@@ -224,6 +227,7 @@ void Robot::run()
 	turnMultiplier = 4;
       }
       if(dIter->second[0] < 30) {
+        turnMultiplier = -2;
 	forward = false;
       }
     }
@@ -245,13 +249,12 @@ void Robot::run()
 
     direction *= turnMultiplier;
 
-    /* Acuate */
+    /* Actuate */
     if(lastForward != forward) {
       if(forward) {
-        m_Motor->setSpeed(m_MinSpeed);
+        m_Motor->setSpeed(forwardSpeed);
       } else {
-	m_Motor->setSpeed(0);
-	//        m_Motor->breakMotor();
+	m_Motor->setSpeed(reverseSpeed);
       }
       lastForward = forward;
     }
