@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -g -O2 -Wall -D_GNU_SOURCE
-ROBOT = SRF08.o Robot.o Adafruit_PWMServoDriver.o Servo.o Motor.o ADS1115.o AnalogDistanceSensor.o GP2Y0A02.o
+ROBOT = SRF08.o Robot.o Adafruit_PWMServoDriver.o Servo.o Motor.o ADS1115.o AnalogDistanceSensor.o GP2Y0A02.o MouseSpeedSensor.o
 
 MOUSE_TEST = Mouse_test.o
 SRF08_TEST = SRF08.o SRF08_test.o

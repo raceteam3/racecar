@@ -125,6 +125,22 @@ void Robot::initialize(const char* cfg)
           } else {
               std::cout << "Analog sensor driver " << driver << " is unknown" << std::endl;
           }
+      } else if(type == "speed") {
+        std::string driver = child.second.get<std::string>("driver");
+        if(driver == "mouse") {
+          if(m_MouseSpeedSensor) {
+            std::cout << "Only one mouse speed sensor is currently supported!" << std::endl;
+            continue;
+          }
+          std::string device = child.second.get<std::string>("device");
+          m_MouseSpeedSensor.reset(new MouseSpeedSensor());
+          if(!m_MouseSpeedSensor->initialize(device.c_str())) {
+            std::cout << "Failed to initialize mouse speed sensor at " << device << std::endl;
+            m_MouseSpeedSensor.reset();
+          }
+        } else {
+          std::cout << "Speed sensor driver " << driver << " is unknown" << std::endl;
+        }
       } else {
 	std::cout << "Sensor type " << type << " is unknown" << std::endl;
       }
