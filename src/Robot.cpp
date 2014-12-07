@@ -1,5 +1,6 @@
 #include "Robot.h"
 
+#include <time.h>
 #include <sstream>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -179,6 +180,8 @@ void Robot::run()
   int forwardSpeed = m_MinSpeed;
   int reverseSpeed = -m_MinSpeed;
 
+  struct timespec lastSpeedChange = {0,0};
+
   while(running) {
 
     /* Sense */
@@ -249,13 +252,48 @@ void Robot::run()
 
     direction *= turnMultiplier;
 
+    bool moving = false;
+    if(m_MouseSpeedSensor) {
+      MouseSpeedSensor::MouseSpeed speed = m_MouseSpeedSensor->getSpeed();
+      moving = (speed.x != 0) || (speed.y != 0);
+    } else {
+      moving = true;
+    }
+
+    bool updateSpeed = false;
+    if(!moving && forward == lastForward) {
+      struct timespec spec;
+       clock_gettime(CLOCK_MONOTONIC, &spec);
+       if(spec.tv_sec == lastSpeedChange.tv_sec) {
+         if(spec.tv_nsec - lastSpeedChange.tv_nsec > 1000000*500) {
+           updateSpeed = true;
+         }
+       } else if(spec.tv_sec == lastSpeedChange.tv_sec + 1) {
+         if(1000000000 - lastSpeedChange.tv_nsec + spec.tv_nsec > 1000000*500) {
+           updateSpeed = true;
+         }
+       } else {
+         updateSpeed = true;
+       }
+    }
+
+    if(updateSpeed) {
+      if(forward) {
+        forwardSpeed++;
+      } else {
+        reverseSpeed--;
+      }
+    }
+
     /* Actuate */
-    if(lastForward != forward) {
+    if(lastForward != forward || updateSpeed) {
+      moving = false;
       if(forward) {
         m_Motor->setSpeed(forwardSpeed);
       } else {
 	m_Motor->setSpeed(reverseSpeed);
       }
+      clock_gettime(CLOCK_MONOTONIC, &lastSpeedChange);
       lastForward = forward;
     }
     if(lastDirection != direction) {

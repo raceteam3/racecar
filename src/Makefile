@@ -8,7 +8,7 @@ PWM_TEST = Adafruit_PWMServoDriver.o PWM_test.o
 SERVO_TEST = Adafruit_PWMServoDriver.o Servo.o Servo_test.o
 ADS1115_TEST = ADS1115.o ADS1115_test.o
 GP2Y0A02_TEST = ADS1115.o AnalogDistanceSensor.o GP2Y0A02.o GP2Y0A02_test.o
-LDFLAGS = -lpthread -lncursesw
+LDFLAGS = -lpthread -lncursesw -lrt
 
 ifdef EMULATE
 CFLAGS += -Iemulation
