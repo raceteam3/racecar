@@ -345,8 +345,8 @@ void Robot::runManual()
   int startx = 0;
   int starty = 0;
 
-  int8_t speed = 0;
-  int8_t turn = 0;
+  int speed = 0;
+  int turn = 0;
 
   std::map<int, boost::shared_ptr<AnalogDistanceSensor> >::const_iterator analogIter=m_AnalogDistanceSensors.end();
 
