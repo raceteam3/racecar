@@ -246,7 +246,7 @@ void Robot::run()
 
     if(!leftDistance->second.empty() && !rightDistance->second.empty() && !leftSoundDistance->second.empty() && !rightSoundDistance->second.empty()) {
       int right = rightDistance->second.back();
-      int left = rightDistance->second.back();
+      int left = leftDistance->second.back();
       if(rightSoundDistance->second.back() < 25) {
 	right = rightSoundDistance->second.back();
       }
