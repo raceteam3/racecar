@@ -318,13 +318,13 @@ void Robot::run()
       if(quickRampup) {
 	if(forward) {
 	  forwardSpeed+=10;
-	  if(forwardSpeed >= lastForwardSpeed) {
+	  if(forwardSpeed >= maxForwardSpeed) {
 	    forwardSpeed = maxForwardSpeed;
 	    quickRampup = false;
 	  }
 	} else {
 	  reverseSpeed-=10;
-	  if(reverseSpeed >= lastReverseSpeed) {
+	  if(reverseSpeed >= maxReverseSpeed) {
 	    reverseSpeed = maxReverseSpeed;
 	    quickRampup = false;
 	  }
@@ -342,10 +342,10 @@ void Robot::run()
     if(lastForward != forward || updateSpeed) {
       if(lastForward != forward && moving) {
 	if(forward) {
-	  maxForwardSpeed = max(maxForwardSpeed, forwardSpeed);
+	  maxForwardSpeed = std::max<int>(maxForwardSpeed, forwardSpeed);
 	  forwardSpeed = m_InitialForwardSpeed;
 	} else {
-	  maxReverseSpeed = max(maxReverseSpeed, reverseSpeed);
+	  maxReverseSpeed = std::max<int>(maxReverseSpeed, reverseSpeed);
 	  reverseSpeed = m_InitialReverseSpeed;
 	}
 	quickRampup = true;
