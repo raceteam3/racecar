@@ -245,13 +245,24 @@ void Robot::run()
     std::map<int, boost::circular_buffer<int> >::iterator rightSoundDistance = distances.find(90);
 
     if(!leftDistance->second.empty() && !rightDistance->second.empty() && !leftSoundDistance->second.empty() && !rightSoundDistance->second.empty()) {
-      if(leftDistance->second.back() > rightDistance->second.back() + 20) {
-          if((rightDistance->second.back()) < 50  || rightSoundDistance->second.back() < 20 || (turnMultiplier != 1)) {
-	  direction = -80;
-	}
-      } else {
-	if((leftDistance->second.back() < 90) || leftSoundDistance->second.back() < 15 || (turnMultiplier != 1)) {
-	  direction = 80;
+      int right = rightDistance->second.back();
+      int left = rightDistance->second.back();
+      if(rightSoundDistance->second.back() < 25) {
+	right = rightSoundDistance->second.back();
+      }
+      if(leftSoundDistance->second.back() < 20) {
+	left = leftSoundDistance->second.back();
+      }
+
+      if(abs(left-right) > 20 || turnMultiplier != 1) {
+	if(left > right + 20) {
+	  if(right < 50 || turnMultiplier != 1) {
+	    direction = -80;
+	  }
+	} else {
+	  if(left < 90 || turnMultiplier != 1) {
+	    direction = 80;
+	  }
 	}
       }
     }
@@ -385,7 +396,7 @@ void Robot::runManual()
 	mvwprintw(win, 3+i, 2, "Analog sensor at %u degrees: no value", iter->first);
       }
       ++i;
-    }    
+    }
     mvwprintw(win, 3+i, 2, "Button state: %s", (digitalRead(m_ButtonPin) ? "not pressed" : "pressed"));
     ++i;
 
@@ -461,7 +472,7 @@ void Robot::runManual()
 	if(analogIter==m_AnalogDistanceSensors.end()) {
 	  analogIter=m_AnalogDistanceSensors.begin();
 	  analogIter->second->initiateRanging();
-	} 
+	}
 	else if(analogIter->second->rangingComplete()) {
 	  ++analogIter;
 	  if(analogIter==m_AnalogDistanceSensors.end()) {
