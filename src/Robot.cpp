@@ -260,7 +260,7 @@ void Robot::run()
 	    direction = -80;
 	  }
 	} else {
-	  if(left < 90 || turnMultiplier != 1) {
+	  if(left < 70 || turnMultiplier != 1) {
 	    direction = 80;
 	  }
 	}
