@@ -303,9 +303,9 @@ void Robot::run()
       m_Steering->setDirection(direction);
       lastDirection = direction;
     }
-  }
+    usleep(1000 * 10);
 
-  usleep(1000 * 10);
+  }
 
 #if 0
   /* Go forward at 10% of top speed for five seconds */
