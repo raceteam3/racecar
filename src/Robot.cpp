@@ -240,13 +240,17 @@ void Robot::run()
     int direction = 0;
     std::map<int, boost::circular_buffer<int> >::iterator leftDistance = distances.find(135);
     std::map<int, boost::circular_buffer<int> >::iterator rightDistance = distances.find(45);
-    if(!leftDistance->second.empty() && !rightDistance->second.empty()) {
+
+    std::map<int, boost::circular_buffer<int> >::iterator leftSoundDistance = distances.find(270);
+    std::map<int, boost::circular_buffer<int> >::iterator rightSoundDistance = distances.find(90);
+
+    if(!leftDistance->second.empty() && !rightDistance->second.empty() && !leftSoundDistance->second.empty() && !rightSoundDistance->second.empty()) {
       if(leftDistance->second.back() > rightDistance->second.back() + 20) {
-	if((rightDistance->second.back()) < 50  || (turnMultiplier != 1)) {
+          if((rightDistance->second.back()) < 50  || rightSoundDistance->second.back() < 20 || (turnMultiplier != 1)) {
 	  direction = -80;
 	}
       } else {
-	if((leftDistance->second.back() < 90) || (turnMultiplier != 1)) {
+	if((leftDistance->second.back() < 90) || leftSoundDistance->second.back() < 15 || (turnMultiplier != 1)) {
 	  direction = 80;
 	}
       }
