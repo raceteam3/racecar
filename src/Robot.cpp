@@ -257,11 +257,11 @@ void Robot::run()
       if(abs(left-right) > 20 || turnMultiplier != 1) {
 	if(left > right + 20) {
 	  if(right < 50 || turnMultiplier != 1) {
-	    direction = -80;
+	    direction = -60;
 	  }
 	} else {
 	  if(left < 70 || turnMultiplier != 1) {
-	    direction = 80;
+	    direction = 60;
 	  }
 	}
       }
