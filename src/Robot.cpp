@@ -179,6 +179,7 @@ void Robot::run()
 
   int forwardSpeed = m_MinSpeed;
   int reverseSpeed = -m_MinSpeed;
+  int moving = 0;
 
   struct timespec lastSpeedChange = {0,0};
 
@@ -252,12 +253,15 @@ void Robot::run()
 
     direction *= turnMultiplier;
 
-    bool moving = false;
     if(m_MouseSpeedSensor) {
       MouseSpeedSensor::MouseSpeed speed = m_MouseSpeedSensor->getSpeed();
-      moving = (speed.x != 0) || (speed.y != 0);
+      if((abs(speed.y) > 10)) {
+	moving = 10;
+      } else if(moving){
+	moving--;
+      }
     } else {
-      moving = true;
+      moving = 10;
     }
 
     bool updateSpeed = false;
@@ -279,15 +283,14 @@ void Robot::run()
 
     if(updateSpeed) {
       if(forward) {
-        forwardSpeed++;
+        forwardSpeed+=2;
       } else {
-        reverseSpeed--;
+        reverseSpeed-=2;
       }
     }
 
     /* Actuate */
     if(lastForward != forward || updateSpeed) {
-      moving = false;
       if(forward) {
         m_Motor->setSpeed(forwardSpeed);
       } else {
