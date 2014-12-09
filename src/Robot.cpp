@@ -223,13 +223,13 @@ void Robot::run()
     int turnMultiplier = 1;
     std::map<int, boost::circular_buffer<int> >::iterator dIter = distances.find(0);
     if(!dIter->second.empty()) {
-      if(dIter->second[0] < 80) {
+      if(dIter->second.back() < 80) {
 	turnMultiplier = 2;
       }
-      if(dIter->second[0] < 50) {
+      if(dIter->second.back() < 50) {
 	turnMultiplier = 4;
       }
-      if(dIter->second[0] < 30) {
+      if(dIter->second.back() < 30) {
         turnMultiplier = -2;
 	forward = false;
       }
@@ -239,12 +239,12 @@ void Robot::run()
     std::map<int, boost::circular_buffer<int> >::iterator leftDistance = distances.find(135);
     std::map<int, boost::circular_buffer<int> >::iterator rightDistance = distances.find(45);
     if(!leftDistance->second.empty() && !rightDistance->second.empty()) {
-      if(leftDistance->second[0] > rightDistance->second[0] + 20) {
-	if((rightDistance->second[0]) < 50  || (turnMultiplier != 1)) {
+      if(leftDistance->second.back() > rightDistance->second.back() + 20) {
+	if((rightDistance->second.back()) < 50  || (turnMultiplier != 1)) {
 	  direction = -80;
 	}
       } else {
-	if((leftDistance->second[0] < 90) || (turnMultiplier != 1)) {
+	if((leftDistance->second.back() < 90) || (turnMultiplier != 1)) {
 	  direction = 80;
 	}
       }
