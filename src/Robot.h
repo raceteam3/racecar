@@ -34,7 +34,8 @@ class Robot
   boost::shared_ptr<MouseSpeedSensor> m_MouseSpeedSensor;
   int m_ButtonPin;
   int m_LedPin;
-  int m_MinSpeed;
+  int m_InitialForwardSpeed;
+  int m_InitialReverseSpeed;
   bool m_LedState;
 };
 #endif

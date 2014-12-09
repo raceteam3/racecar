@@ -1,6 +1,8 @@
 {
   "robot":
   {
+    "initialForwardSpeed": 50,
+    "initialReverseSpeed": -50,
     "pwm":
     [
       {
@@ -21,8 +23,7 @@
       "pwm": "pwm",
       "channel": 0,
       "maxForward": 491,
-      "maxReverse": 250,
-      "minSpeed": 52
+      "maxReverse": 250
     },
     "ADCs":
     [

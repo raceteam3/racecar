@@ -25,7 +25,7 @@ int main(int argc, const char** argv)
   return 0;
 }
 
-Robot::Robot()
+Robot::Robot() : m_InitialForwardSpeed(0), m_InitialReverseSpeed(0)
 {
 }
 
@@ -39,6 +39,17 @@ void Robot::initialize(const char* cfg)
 {
   boost::property_tree::ptree pt;
   boost::property_tree::json_parser::read_json(cfg, pt);
+
+  try {
+    m_InitialForwardSpeed = pt.get<int>("robot.initialForwardSpeed");
+  } catch(boost::property_tree::ptree_error& e) {
+    std::cout << "Failed to read inititial forward speed" << std::endl;
+  }
+  try {
+    m_InitialReverseSpeed = pt.get<int>("robot.initialReverseSpeed");
+  } catch(boost::property_tree::ptree_error& e) {
+    std::cout << "Failed to read inititial reverse speed" << std::endl;
+  }
   try {
     BOOST_FOREACH(const boost::property_tree::ptree::value_type& child, pt.get_child("robot.pwm")) {
       std::string name = child.second.get<std::string>("name");
@@ -71,7 +82,6 @@ void Robot::initialize(const char* cfg)
     int channel = pt.get<int>("robot.motor.channel");
     int maxForward = pt.get<int>("robot.motor.maxForward");
     int maxReverse = pt.get<int>("robot.motor.maxReverse");
-    m_MinSpeed = pt.get<int>("robot.motor.minSpeed");
     boost::shared_ptr<Adafruit_PWMServoDriver> pwm = m_PWMDrivers.at(pt.get<std::string>("robot.motor.pwm"));
     m_Motor = boost::shared_ptr<Motor>(new Motor(pwm, channel, maxReverse, maxForward));
   } catch(boost::property_tree::ptree_error& e) {
@@ -177,8 +187,11 @@ void Robot::run()
   bool lastForward = false;
   int lastDirection = 0;
 
-  int forwardSpeed = m_MinSpeed;
-  int reverseSpeed = -m_MinSpeed;
+  int forwardSpeed = m_InitialForwardSpeed;
+  int reverseSpeed = m_InitialReverseSpeed;
+  int maxForwardSpeed = m_InitialForwardSpeed;
+  int maxReverseSpeed = m_InitialReverseSpeed;
+  bool quickRampup = false;
   int moving = 0;
   int readSpeedCounter = 0;
 
@@ -273,6 +286,7 @@ void Robot::run()
       if(m_MouseSpeedSensor) {
 	MouseSpeedSensor::MouseSpeed speed = m_MouseSpeedSensor->getSpeed();
 	if((forward && speed.y < -50) || (!forward && speed.y > 50)) {
+	  quickRampup = false;
 	  moving = 10;
 	} else if(moving) {
 	  moving--;
@@ -301,15 +315,41 @@ void Robot::run()
     }
 
     if(updateSpeed) {
-      if(forward) {
-        forwardSpeed+=2;
+      if(quickRampup) {
+	if(forward) {
+	  forwardSpeed+=10;
+	  if(forwardSpeed >= lastForwardSpeed) {
+	    forwardSpeed = maxForwardSpeed;
+	    quickRampup = false;
+	  }
+	} else {
+	  reverseSpeed-=10;
+	  if(reverseSpeed >= lastReverseSpeed) {
+	    reverseSpeed = maxReverseSpeed;
+	    quickRampup = false;
+	  }
+	}
       } else {
-        reverseSpeed-=2;
+	if(forward) {
+	  forwardSpeed+=2;
+	} else {
+	  reverseSpeed-=2;
+	}
       }
     }
 
     /* Actuate */
     if(lastForward != forward || updateSpeed) {
+      if(lastForward != forward && moving) {
+	if(forward) {
+	  maxForwardSpeed = max(maxForwardSpeed, forwardSpeed);
+	  forwardSpeed = m_InitialForwardSpeed;
+	} else {
+	  maxReverseSpeed = max(maxReverseSpeed, reverseSpeed);
+	  reverseSpeed = m_InitialReverseSpeed;
+	}
+	quickRampup = true;
+      }
       if(forward) {
         m_Motor->setSpeed(forwardSpeed);
       } else {
