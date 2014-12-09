@@ -180,6 +180,7 @@ void Robot::run()
   int forwardSpeed = m_MinSpeed;
   int reverseSpeed = -m_MinSpeed;
   int moving = 0;
+  int readSpeedCounter = 0;
 
   struct timespec lastSpeedChange = {0,0};
 
@@ -253,15 +254,18 @@ void Robot::run()
 
     direction *= turnMultiplier;
 
-    if(m_MouseSpeedSensor) {
-      MouseSpeedSensor::MouseSpeed speed = m_MouseSpeedSensor->getSpeed();
-      if((abs(speed.y) > 10)) {
+    if(readSpeedCounter++ == 5) {
+      if(m_MouseSpeedSensor) {
+	MouseSpeedSensor::MouseSpeed speed = m_MouseSpeedSensor->getSpeed();
+	if((forward && speed.y < -50) || (!forward && speed.y > 50)) {
+	  moving = 10;
+	} else if(moving) {
+	  moving--;
+	}
+      } else {
 	moving = 10;
-      } else if(moving){
-	moving--;
       }
-    } else {
-      moving = 10;
+      readSpeedCounter = 0;
     }
 
     bool updateSpeed = false;
