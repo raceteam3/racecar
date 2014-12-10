@@ -244,7 +244,7 @@ void Robot::run()
       if(dIter->second.back() < 50) {
 	turnMultiplier = 4;
       }
-      if(dIter->second.back() < 30 || (!lastForward && dIter->second.back() < 40)) {
+      if(dIter->second.back() < 30 || (!lastForward && dIter->second.back() < 50)) {
         turnMultiplier = -2;
 	forward = false;
       }
