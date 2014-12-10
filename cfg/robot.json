@@ -2,7 +2,7 @@
   "robot":
   {
     "initialForwardSpeed": 50,
-    "initialReverseSpeed": -50,
+    "initialReverseSpeed": -90,
     "pwm":
     [
       {
