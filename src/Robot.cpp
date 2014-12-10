@@ -340,7 +340,7 @@ void Robot::run()
 
     /* Actuate */
     if(lastForward != forward || updateSpeed) {
-      if(lastForward != forward && moving) {
+      if(lastForward != forward) {
 	if(forward) {
 	  maxForwardSpeed = std::max<int>(maxForwardSpeed, forwardSpeed);
 	  forwardSpeed = m_InitialForwardSpeed;
