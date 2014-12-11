@@ -175,6 +175,8 @@ void Robot::initialize(const char* cfg)
 
 void Robot::run()
 {
+  m_Motor->setSpeed(0);
+  m_Steering->setDirection(0);
   while(digitalRead(m_ButtonPin) == 1) {
     usleep(100);
   }
@@ -365,6 +367,9 @@ void Robot::run()
     usleep(1000 * 10);
 
   }
+
+  m_Motor->setSpeed(0);
+  m_Steering->setDirection(0);
 
 #if 0
   /* Go forward at 10% of top speed for five seconds */
