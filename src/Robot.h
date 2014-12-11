@@ -11,6 +11,9 @@
 
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
+#include <boost/asio.hpp>
+#include <boost/asio/impl/io_service.hpp>
+#include <boost/asio/signal_set.hpp>
 #include <map>
 #include <string>
 
@@ -25,6 +28,9 @@ class Robot
   void runManual();
 
  private:
+  void signalHandler(const boost::system::error_code& ec, int signalNumber);
+
+ private:
   boost::shared_ptr<Servo> m_Steering;
   boost::shared_ptr<Motor> m_Motor;
   std::map<std::string, boost::shared_ptr<Adafruit_PWMServoDriver> > m_PWMDrivers;
@@ -37,5 +43,9 @@ class Robot
   int m_InitialForwardSpeed;
   int m_InitialReverseSpeed;
   bool m_LedState;
+  bool m_Running;
+
+  boost::asio::io_service m_IoService;
+  boost::asio::signal_set m_Signals;
 };
 #endif

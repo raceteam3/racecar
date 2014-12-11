@@ -25,7 +25,7 @@ int main(int argc, const char** argv)
   return 0;
 }
 
-Robot::Robot() : m_InitialForwardSpeed(0), m_InitialReverseSpeed(0)
+Robot::Robot() : m_InitialForwardSpeed(0), m_InitialReverseSpeed(0), m_Running(true), m_IoService(), m_Signals(m_IoService, SIGINT, SIGTERM)
 {
 }
 
@@ -171,6 +171,10 @@ void Robot::initialize(const char* cfg)
   /* Button is input with pull-up */
   pinMode(m_ButtonPin, INPUT);
   pullUpDnControl(m_ButtonPin, PUD_UP);
+  m_Signals.async_wait(boost::bind(&Robot::signalHandler,
+                                   this,
+                                   boost::asio::placeholders::error,
+                                   boost::asio::placeholders::signal_number));
 }
 
 void Robot::run()
@@ -183,7 +187,6 @@ void Robot::run()
   digitalWrite(m_LedPin, HIGH);
 
   std::map<int, boost::shared_ptr<AnalogDistanceSensor> >::const_iterator analogIter=m_AnalogDistanceSensors.end();
-  bool running = true;
 
   std::map<int, boost::circular_buffer<int> > distances;
   bool lastForward = false;
@@ -199,8 +202,7 @@ void Robot::run()
 
   struct timespec lastSpeedChange = {0,0};
 
-  while(running) {
-
+  while(m_Running) {
     /* Sense */
     for(std::map<int, boost::shared_ptr<srf08> >::const_iterator iter=m_SRF08Sensors.begin(); iter!=m_SRF08Sensors.end(); ++iter) {
       if(iter->second->rangingComplete()) {
@@ -365,7 +367,7 @@ void Robot::run()
       lastDirection = direction;
     }
     usleep(1000 * 10);
-
+    m_IoService.poll();
   }
 
   m_Motor->setSpeed(0);
@@ -396,8 +398,6 @@ void Robot::run()
 
 void Robot::runManual()
 {
-  bool run = true;
-
   int startx = 0;
   int starty = 0;
 
@@ -419,7 +419,7 @@ void Robot::runManual()
   keypad(win, TRUE);
   refresh();
 
-  while(run) {
+  while(m_Running) {
     wclear(win);
     box(win, 0, 0);
     mvwprintw(win, 1, 2, "SPEED: %i", speed);
@@ -454,6 +454,11 @@ void Robot::runManual()
     wrefresh(win);
 
     c = wgetch(win);
+
+    m_IoService.poll();
+    if(!m_Running) {
+      break;
+    }
     switch(c)
     {
       // Increase speed
@@ -503,7 +508,7 @@ void Robot::runManual()
         turn = 0;
         m_Motor->setSpeed(speed);
         m_Steering->setDirection(turn);
-        run = false;
+        m_Running = false;
         break;
       case 'a':
       case 'A':
@@ -535,8 +540,19 @@ void Robot::runManual()
       case 'P':
 	break;
     }
+
+    m_IoService.poll();
   }
   clrtoeol();
   refresh();
   endwin();
+
+  m_Motor->setSpeed(0);
+  m_Steering->setDirection(0);
+}
+
+void Robot::signalHandler(const boost::system::error_code& ec, int signalNumber)
+{
+  std::cout << "Terminating robot" << std::endl;
+  m_Running = false;
 }
